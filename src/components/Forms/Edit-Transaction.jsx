@@ -108,7 +108,7 @@ const EditTransaction = ({ transaction }) => {
         <DialogHeader>
           <DialogTitle>Edit Transaction</DialogTitle>
           <DialogDescription>
-            Make changes to your transaction here. Click save when you're done.
+            Make changes to your transaction here. Click save when you are done.
           </DialogDescription>
         </DialogHeader>
         <div className="bg-[#F2F5FF] rounded-lg p-3 sm:p-8">
