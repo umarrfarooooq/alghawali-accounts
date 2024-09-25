@@ -104,7 +104,7 @@ const EditTransaction = ({ transaction }) => {
           border="border border-[#107243]"
         />
       </DialogTrigger>
-      <DialogContent className="bg-[#FFFBFA] border border-[#EBEBEB] w-full lg:max-w-[38rem] lg:min-w-[38rem] mx-auto p-3 sm:p-8 rounded-2xl overflow-y-scroll max-h-screen">
+      <DialogContent className="bg-[#FFFBFA] border border-[#EBEBEB] w-full lg:max-w-[38rem] lg:min-w-[38rem] mx-auto p-3 sm:p-8 rounded-2xl overflow-y-scroll max-h-[85vh]">
         <DialogHeader>
           <DialogTitle>Edit Transaction</DialogTitle>
           <DialogDescription>
