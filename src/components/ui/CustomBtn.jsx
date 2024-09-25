@@ -58,12 +58,16 @@ const CustomButton = forwardRef(
 
     if (link && type !== "submit") {
       return (
-        <Link href={link} onClick={handleClick}>
+        <Link
+          href={link}
+          onClick={handleClick}
+          className={buttonClass}
+          ref={ref}
+        >
           <button
-            ref={ref}
+            className="flex items-center gap-1"
             disabled={isLoading || loading}
             type={type || "button"}
-            className={buttonClass}
           >
             <ButtonContent />
           </button>

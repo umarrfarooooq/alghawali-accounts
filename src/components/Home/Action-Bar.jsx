@@ -10,12 +10,14 @@ const ActionBar = () => {
           <div className="flex gap-2">
             <CustomButton
               link="new-hiring"
+              className="w-full md:w-max"
               txt="New Hiring"
               color="text-[#107243]"
               border="border border-[#107243]"
             />
             <CustomButton
               txt="List Again"
+              className="w-full md:w-max"
               color="text-[#107243]"
               border="border border-[#107243]"
             />
