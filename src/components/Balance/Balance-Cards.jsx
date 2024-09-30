@@ -4,6 +4,7 @@ import { useStaffAccount } from "@/hooks/useStaffAccount";
 import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
 import { ArrowDown, ArrowUp, Wallet } from "lucide-react";
 import CustomLoading from "../ui/CustomLoading";
+import CustomButton from "../ui/CustomBtn";
 
 const BalanceCards = () => {
   const { staffId } = VerifyStaffToken();
@@ -27,7 +28,15 @@ const BalanceCards = () => {
   };
 
   return (
-    <div className="rounded-xl border border-[#031d921a] bg-[#FFFBFA] p-4 md:p-6">
+    <div className="rounded-xl flex flex-col gap-4 border border-[#031d921a] bg-[#FFFBFA] p-4 md:p-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 md:gap-6 gap-4">
+        <CustomButton
+          link="/transaction/my"
+          txt="View Transactions"
+          color="text-[#107243]"
+          border="border border-[#107243]"
+        />
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 md:gap-6 gap-4">
         <BalanceCard
           amount={staffAccount.balance}

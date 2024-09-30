@@ -1,7 +1,7 @@
-import { DollarSign, Download, Eye, Wallet } from "lucide-react";
+import { Wallet } from "lucide-react";
 import React from "react";
 import CustomButton from "../ui/CustomBtn";
-const StaffAccount = ({ name, bg, svg, svgBg, amount }) => {
+const StaffAccount = ({ name, bg, svg, svgBg, amount, id }) => {
   return (
     <div
       className={`p-4 rounded-lg ${
@@ -24,20 +24,13 @@ const StaffAccount = ({ name, bg, svg, svgBg, amount }) => {
       </div>
       <div className="flex flex-col gap-3">
         <CustomButton
-          txt="Download Statement"
-          icon={<Download size={20} />}
-          color="text-[#107243]"
-          border="border border-[#107243]"
-        />
-        <CustomButton
           txt="View Transactions"
-          icon={<Eye size={20} />}
+          link={`/transaction/staff/${id}`}
           color="text-[#107243]"
           border="border border-[#107243]"
         />
         <CustomButton
           txt="View Balance Details"
-          icon={<DollarSign size={20} />}
           color="text-[#107243]"
           border="border border-[#107243]"
         />

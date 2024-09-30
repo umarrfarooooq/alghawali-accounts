@@ -23,6 +23,37 @@ const fetchMyCustomerAccounts = async (searchTerm, customerId) => {
   return data;
 };
 
+const fetchCustomerById = async (customerId) => {
+  const { verifyToken } = VerifyStaffToken();
+  const { data } = await axiosInstance.get(
+    `api/v2/customers/customer-account-by-id/${customerId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${verifyToken}`,
+      },
+    }
+  );
+  return data;
+};
+
+const fetchCustomerTransactions = async (
+  customerId,
+  sortBy = "date",
+  sortOrder = "desc"
+) => {
+  const { verifyToken } = VerifyStaffToken();
+  const { data } = await axiosInstance.get(
+    `api/v1/transaction/customer/${customerId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${verifyToken}`,
+      },
+      params: { sortBy, sortOrder },
+    }
+  );
+  return data;
+};
+
 const fetchPendingDuesToReceive = async () => {
   const { verifyToken } = VerifyStaffToken();
   const { data } = await axiosInstance.get(
@@ -114,6 +145,22 @@ export const useMyCustomerAccounts = (searchTerm, customerId, { enabled }) => {
     queryKey: ["myCustomerAccounts", customerId, searchTerm],
     queryFn: () => fetchMyCustomerAccounts(searchTerm, customerId),
     enabled,
+  });
+};
+
+export const useCustomerTransactions = (customerId, sortBy, sortOrder) => {
+  return useQuery({
+    queryKey: ["customerTransactions", customerId, sortBy, sortOrder],
+    queryFn: () => fetchCustomerTransactions(customerId, sortBy, sortOrder),
+    enabled: !!customerId,
+  });
+};
+
+export const useCustomerById = (customerId) => {
+  return useQuery({
+    queryKey: ["customerById", customerId],
+    queryFn: () => fetchCustomerById(customerId),
+    enabled: !!customerId,
   });
 };
 

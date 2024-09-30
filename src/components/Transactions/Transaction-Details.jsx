@@ -1,13 +1,16 @@
 "use client";
 import React from "react";
-import { ArrowDown, ArrowUp, Check, Clock, Eye, Pencil, X } from "lucide-react";
+import { Check, Clock, Eye, X } from "lucide-react";
 import { useTransactionById } from "@/hooks/useTransactions";
 import CustomButton from "../ui/CustomBtn";
 import CustomLoading from "../ui/CustomLoading";
 import axiosInstance from "@/utils/axios";
 import EditTransaction from "../Forms/Edit-Transaction";
-
+import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
+import roles from "@/lib/roles";
 const TransactionDetailsComponent = ({ id }) => {
+  const { roles: staffRoles } = VerifyStaffToken();
+  const hasPermission = staffRoles.includes(roles.fullAccessOnAccounts);
   const { data: transaction, isLoading, error } = useTransactionById(id);
   if (isLoading) {
     return (
@@ -38,20 +41,11 @@ const TransactionDetailsComponent = ({ id }) => {
 
   const handleDecline = async () => {
     try {
-      const reason = prompt(
-        "Please provide a reason for declining the transaction:"
-      );
-      if (!reason) {
-        alert("Decline reason is required");
-        return;
-      }
-
       const response = await axiosInstance.post(
         "/api/v1/transaction/handlePendingTransaction",
         {
           transactionId: transaction._id,
           action: "decline",
-          reason,
         }
       );
 
@@ -141,10 +135,10 @@ const TransactionDetailsComponent = ({ id }) => {
                       <Clock size={16} color="#f29339" />
                     )}
                     {transaction.status === "Approved" && (
-                      <ArrowUp size={16} color="#0C8B3F" />
+                      <Check size={16} color="#0C8B3F" />
                     )}
                     {transaction.status === "Rejected" && (
-                      <ArrowDown size={16} color="#f56565" />
+                      <X size={16} color="#f56565" />
                     )}
                   </span>
                 )}
@@ -179,35 +173,43 @@ const TransactionDetailsComponent = ({ id }) => {
                   : transaction.sendedBy?.staffName}
               </div>
             </div>
+            {transaction.proof && (
+              <div>
+                <div className="text-xs text-[#434146]">Payment Proof</div>
+                <div className="text-sm text-[#434146] font-semibold">
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={`${process.env.NEXT_PUBLIC_API_URL}${transaction.proof}`}
+                    className="cursor-pointer underline"
+                  >
+                    view payment proof
+                  </a>
+                </div>
+              </div>
+            )}
             <div>
-              <div className="text-xs text-[#434146]">Payment Proof</div>
-              <div className="text-sm text-[#434146] font-semibold">
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={`${process.env.NEXT_PUBLIC_API_URL}${transaction.proof}`}
-                  className="cursor-pointer underline"
-                >
-                  view payment proof
-                </a>
+              <div className="text-xs text-[#434146]">Invoice Number</div>
+              <div className="text-sm text-[#434146] font-semibold flex items-center gap-1">
+                {transaction.invoice?.number}{" "}
               </div>
             </div>
             <div>
-              <div className="text-xs text-[#434146]">Invoice</div>
+              <div className="text-xs text-[#434146]">Invoice PDF</div>
               <div className="text-sm text-[#434146] font-semibold flex items-center gap-1">
-                {transaction.invoice?.number}{" "}
                 <a
                   target="_blank"
                   rel="noopener noreferrer"
                   href={`${process.env.NEXT_PUBLIC_API_URL}uploads/${transaction.invoice?.path}`}
-                  className="cursor-pointer"
+                  className="cursor-pointer underline "
                 >
-                  <Eye size={16} color="#0C8B3F" />{" "}
+                  view invoice
                 </a>
               </div>
             </div>
           </div>
         </div>
+        {}
         <div className="flex justify-end gap-2 mt-4">
           {transaction.status === "Pending" && (
             <>
@@ -229,7 +231,7 @@ const TransactionDetailsComponent = ({ id }) => {
               />
             </>
           )}
-          <EditTransaction transaction={transaction} />
+          {hasPermission && <EditTransaction transaction={transaction} />}
         </div>
       </div>
     </>

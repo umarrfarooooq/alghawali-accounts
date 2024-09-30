@@ -1,9 +1,9 @@
-import { ArrowRight, Check, Clock, X } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUp } from "lucide-react";
 import React from "react";
 import ViewDetails from "../ui/view-details";
 import Link from "next/link";
 
-const TransactionList = ({ transaction, type }) => {
+const TransactionList = ({ transaction }) => {
   const formattedDate = new Date(transaction?.date).toLocaleDateString();
 
   return (
@@ -25,24 +25,31 @@ const TransactionList = ({ transaction, type }) => {
             </div>
           </div>
           <div>
-            <div className="text-xs text-[#434146]">Payment Method</div>
-            <div className="text-sm text-[#434146] font-semibold">
-              {transaction?.paymentMethod}
+            <div className="text-xs text-[#434146]">Status</div>
+            <div
+              className={`text-sm font-semibold ${
+                transaction?.status === "Approved"
+                  ? "text-[#0C8B3F]"
+                  : transaction?.status === "Rejected"
+                  ? "text-[#f52828]"
+                  : transaction?.status === "Pending"
+                  ? "text-yellow-500"
+                  : "text-[#434146]"
+              }`}
+            >
+              {transaction?.status}
             </div>
           </div>
           <div>
             <div className="text-xs text-[#434146]">Amount</div>
             <div className="text-sm text-[#434146] font-semibold flex items-center gap-1">
-              {transaction?.status && (
+              {transaction?.type && (
                 <span>
-                  {transaction.status === "Pending" && (
-                    <Clock size={16} color="#f29339" />
+                  {transaction.type === "Received" && (
+                    <ArrowUp size={16} color="#0C8B3F" />
                   )}
-                  {transaction.status === "Approved" && (
-                    <Check size={16} color="#0C8B3F" />
-                  )}
-                  {transaction.status === "Declined" && (
-                    <X size={16} color="#f56565" />
+                  {transaction.type === "Sent" && (
+                    <ArrowDown size={16} color="#f52828" />
                   )}
                 </span>
               )}
@@ -52,9 +59,13 @@ const TransactionList = ({ transaction, type }) => {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs text-[#434146]">Recieved By</div>
+              <div className="text-xs text-[#434146]">
+                {transaction?.type === "Received" ? "Recieved By" : "Sent By"}
+              </div>
               <div className="text-sm text-[#434146] font-semibold">
-                {transaction?.receivedBy?.staffName}
+                {transaction?.type === "Received"
+                  ? transaction?.receivedBy?.staffName || "Not Assigned"
+                  : transaction?.sendedBy?.staffName || "Not Assigned"}
               </div>
             </div>
             <Link href={`/transaction/${transaction._id}`}>

@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -8,9 +9,14 @@ export const metadata = {
   title: "Al Ghawali Accounts",
   description: "Al Ghawali Accounts",
   manifest: "/manifest.json",
+};
+
+export const viewport = {
   themeColor: "#ffffff",
-  viewport:
-    "minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover",
+  width: 'device-width',
+  initialScale: 1,
+  minimumScale: 1,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }) {
@@ -20,7 +26,7 @@ export default function RootLayout({ children }) {
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </head>
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers>{children} <Toaster /></Providers>
       </body>
     </html>
   );

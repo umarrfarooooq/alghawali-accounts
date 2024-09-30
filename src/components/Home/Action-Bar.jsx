@@ -1,6 +1,6 @@
 import React from "react";
 import CustomButton from "@/components/ui/CustomBtn";
-import { Plus } from "lucide-react";
+import { Plus, Repeat1, BedSingle, BatteryWarning } from "lucide-react";
 const ActionBar = () => {
   return (
     <div className="px-4 md:px-8">
@@ -10,13 +10,16 @@ const ActionBar = () => {
           <div className="flex gap-2">
             <CustomButton
               link="new-hiring"
+              icon={<BedSingle size={20} />}
               className="w-full md:w-max"
               txt="New Hiring"
               color="text-[#107243]"
               border="border border-[#107243]"
             />
             <CustomButton
-              txt="List Again"
+              link="return"
+              icon={<BatteryWarning size={20} />}
+              txt="Return Maid"
               className="w-full md:w-max"
               color="text-[#107243]"
               border="border border-[#107243]"
@@ -24,7 +27,17 @@ const ActionBar = () => {
           </div>
           <div>
             <CustomButton
-              icon={<Plus size={20}/>}
+              link="replace"
+              icon={<Repeat1 size={20} />}
+              txt="Replace Maid"
+              color="text-[#107243]"
+              border="border border-[#107243]"
+            />
+          </div>
+          <div>
+            <CustomButton
+              link="update-payment"
+              icon={<Plus size={20} />}
               txt="Add New Transaction"
               bg="bg-[#107243]"
               color="text-[#FFFBFA]"

@@ -37,9 +37,10 @@ export const useStaffAccount = (staffId, period) => {
   });
 };
 
-export const useAllStaffAccounts = () => {
+export const useAllStaffAccounts = (enabled) => {
   return useQuery({
     queryKey: ["allStaffAccounts"],
     queryFn: fetchAllStaffAccounts,
+    enabled: enabled,
   });
 };

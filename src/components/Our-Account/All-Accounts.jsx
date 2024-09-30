@@ -2,12 +2,23 @@ import React from "react";
 import StaffAccount from "./Staff-Account";
 import { useAllStaffAccounts } from "@/hooks/useStaffAccount";
 import CustomLoading from "../ui/CustomLoading";
-
+import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
+import roles from "@/lib/roles";
 const AllAccounts = () => {
-  const { data: allStaffAccounts, isLoading, isError } = useAllStaffAccounts();
-
+  const { roles: staffRoles } = VerifyStaffToken();
+  const fullAccess = staffRoles.includes(roles.fullAccessOnAccounts);
+  const {
+    data: allStaffAccounts,
+    isLoading,
+    isError,
+  } = useAllStaffAccounts(fullAccess);
+  if (!fullAccess) return <></>;
   if (isLoading) {
-    return <div><CustomLoading /></div>;
+    return (
+      <div>
+        <CustomLoading />
+      </div>
+    );
   }
 
   if (isError) {

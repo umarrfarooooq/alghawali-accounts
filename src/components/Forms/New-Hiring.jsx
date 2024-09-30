@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
 import Input from "@/components/ui/Input";
 import Label from "@/components/ui/Label";
@@ -15,9 +16,12 @@ import RecievedBy from "../Form-Components/Recieved-By";
 import axiosInstance from "@/utils/axios";
 import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
 import UniformServiceAmount from "../New-Hiring/UniformService";
-
+import Message from "../ui/Message";
+import { useToast } from "@/hooks/use-toast";
 const NewHiredForm = () => {
   const { verifyToken, staffAccountId } = VerifyStaffToken();
+  const { toast } = useToast();
+  const router = useRouter();
   const [selectedMaidId, setSelectedMaidId] = useState("");
   const [hiringType, setHiringType] = useState("On Trial");
   const [hiringDate, setHiringDate] = useState(null);
@@ -59,7 +63,7 @@ const NewHiredForm = () => {
       return setErrorMessage("Please Select Valid Maid Profile");
     }
     console.log(staffAccountId);
-    
+
     const formData = new FormData(e.currentTarget);
     formData.append("hiringDate", hiringDate);
     formData.append("staffAccount", staffAccountId);
@@ -90,6 +94,16 @@ const NewHiredForm = () => {
       if (response.status === 201) {
         console.log("Successfully hired");
         console.log(response);
+        toast({
+          title: "Success",
+          variant: "success",
+          description: "Successfully hired and redirecting to transaction",
+        });
+        setTimeout(() => {
+          const transactionId =
+            response?.data?.savedCustomerAccount?.transactions[0];
+          router.push(`/transaction/${transactionId}`);
+        }, 1000);
       }
       setSpinningLoader(false);
     } catch (error) {
@@ -104,8 +118,18 @@ const NewHiredForm = () => {
             setErrorMessage(error.response.data.errors.join(", "));
           } else if (error.response.data.error) {
             setErrorMessage(error.response.data.error);
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: error.response.data.error,
+            });
           } else {
             setErrorMessage("Validation error. Please check your input.");
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: "Validation error. Please check your input.",
+            });
           }
         } else if (error.response.status === 401) {
           setErrorMessage("Unauthorized. Please log in again.");
@@ -119,6 +143,11 @@ const NewHiredForm = () => {
               error.response.data.message || "Please try again."
             }`
           );
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: error.response.data.message || "Please try again.",
+          });
         }
       } else if (error.request) {
         setErrorMessage(
@@ -126,6 +155,11 @@ const NewHiredForm = () => {
         );
       } else {
         setErrorMessage("An error occurred. Please try again.");
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "An error occurred. Please try again.",
+        });
       }
 
       console.error("Error submitting form:", error);
@@ -140,14 +174,7 @@ const NewHiredForm = () => {
         </div>
 
         <div className="bg-[#F2F5FF] rounded-lg p-3 sm:p-8">
-          {errorMessage && (
-            <div
-              className="p-4 mb-4 w-full md:w-[26rem] text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
-              role="alert"
-            >
-              <span className="font-medium">{errorMessage}</span>
-            </div>
-          )}
+          {errorMessage && <Message type="error" message={errorMessage} />}
           <form onSubmit={handleFormSubmit} className="flex flex-col gap-3">
             <div>
               <RadioGroup
@@ -195,7 +222,11 @@ const NewHiredForm = () => {
             </div>
             <div>
               <Label label="Select Maid" />
-              <MaidSearch selectedMaidId={setSelectedMaidId} />
+              <MaidSearch
+                onMaidSelect={(maid) => setSelectedMaidId(maid._id)}
+                apiEndpoint="api/v1/maids/"
+                placeholder="Search maid for hiring..."
+              />
             </div>
             <div className="flex flex-col gap-1">
               <Label label="Customer Name" htmlFor="fullName" />

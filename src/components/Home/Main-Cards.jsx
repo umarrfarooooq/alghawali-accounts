@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import MainCard from "@/components/Main-Card/Main-Card";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowDown, ArrowUp, IdCard, Shirt } from "lucide-react";
+import { ArrowDown, ArrowUp, Clock, IdCard, Shirt } from "lucide-react";
 import axiosInstance from "@/utils/axios";
 import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
 import AmountPeriod from "../Main-Card/amountPeriod";
 import CustomLoading from "../ui/CustomLoading";
-
+import roles from "@/lib/roles";
 const fetchCardData = async (period) => {
   const { verifyToken } = VerifyStaffToken();
   const { data } = await axiosInstance.get(
-    "api/v1/staffAccounts/all-accounts-summary-withFilters",
+    "api/v1/staffAccounts/all-transactions",
     {
       headers: {
         Authorization: `Bearer ${verifyToken}`,
@@ -22,17 +22,22 @@ const fetchCardData = async (period) => {
 };
 
 const MainCards = () => {
+  const { roles: staffRoles } = VerifyStaffToken();
+  const fullAccess = staffRoles.includes(roles.fullAccessOnAccounts);
   const [selectedPeriod, setSelectedPeriod] = useState("Monthly");
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["cardData", selectedPeriod],
     queryFn: () => fetchCardData(selectedPeriod),
+    enabled: fullAccess,
     staleTime: 300000,
     retry: 2,
   });
 
   useEffect(() => {
-    refetch();
-  }, [selectedPeriod]);
+    if (fullAccess) refetch();
+  }, [selectedPeriod, fullAccess]);
+
+  if (!fullAccess) return <></>;
 
   if (isLoading)
     return (
@@ -46,12 +51,8 @@ const MainCards = () => {
     totalReceived,
     totalSent,
     totalBalance,
-    totalVisaChangeAmount,
-    totalUniformAmount,
     totalTillNowReceived,
     totalTillNowSent,
-    totalVisaChangeAmountTillNow,
-    totalUniformAmountTillNow,
     totalPendingReceived,
     totalPendingSent,
     totalPendingReceivedTillNow,
@@ -94,23 +95,24 @@ const MainCards = () => {
             amount={totalSent}
             totalTillNow={totalTillNowSent}
           />
+
           <MainCard
-            bg="bg-[#e2ff4d1a]"
-            svgBg="bg-[#E2FF4D]"
-            svg={<IdCard />}
-            title="Visa Change Amount"
+            bg="bg-[#ffa64d1a]"
+            svgBg="bg-[#FFA64D]"
+            svg={<Clock color="#FFFBFA" />}
+            title="Pending Received"
             selectedPeriod={selectedPeriod}
-            amount={totalVisaChangeAmount}
-            totalTillNow={totalVisaChangeAmountTillNow}
+            amount={totalPendingReceived}
+            totalTillNow={totalPendingReceivedTillNow}
           />
           <MainCard
-            bg="bg-[#ff4d4d1a]"
-            svgBg="bg-[#FF4D4D]"
-            svg={<Shirt color="#FFFBFA" />}
-            title="Uniform Amount"
+            bg="bg-[#4d9fff1a]"
+            svgBg="bg-[#4D9FFF]"
+            svg={<Clock color="#FFFBFA" />}
+            title="Pending Sent"
             selectedPeriod={selectedPeriod}
-            amount={totalUniformAmount}
-            totalTillNow={totalUniformAmountTillNow}
+            amount={totalPendingSent}
+            totalTillNow={totalPendingSentTillNow}
           />
         </div>
       </div>

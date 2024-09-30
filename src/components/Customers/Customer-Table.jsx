@@ -1,6 +1,7 @@
 import { ArrowRight, Dot } from "lucide-react";
 import React from "react";
 import ViewDetails from "../ui/view-details";
+import Link from "next/link";
 const CustomerTable = ({ customer }) => {
   return (
     <div className="bg-[#F2F2F2] relative rounded-md min-h-[4.25rem] border border-[#C3D0D4]">
@@ -9,7 +10,9 @@ const CustomerTable = ({ customer }) => {
           {customer.profileHiringStatus === "On Trial" && (
             <span
               className={`h-2 w-2 rounded-full ${
-                customer.trialStatus === "Active" ? "bg-[#0C8B3F]" : "bg-[#FF4646]"
+                customer.trialStatus === "Active"
+                  ? "bg-[#0C8B3F]"
+                  : "bg-[#FF4646]"
               }`}
             ></span>
           )}
@@ -32,13 +35,23 @@ const CustomerTable = ({ customer }) => {
             </div>
           </div>
           <div>
-            <div className="text-xs text-[#434146]">Total Amount</div>
+            <div className="text-xs text-[#434146]">
+              {customer.profileHiringStatus === "Return"
+                ? "Refunded Amount"
+                : "Total Amount"}
+            </div>
             <div className="text-sm text-[#434146] font-semibold">
-              {customer.totalAmount}
+              {customer.profileHiringStatus === "Return"
+                ? customer.returnAmount + customer.pendingReturnAmount
+                : customer.totalAmount}
             </div>
           </div>
           <div>
-            <div className="text-xs text-[#434146]">Recieved Amount</div>
+            <div className="text-xs text-[#434146]">
+              {customer.profileHiringStatus === "Return"
+                ? "Remaining Amount"
+                : "Recieved Amount"}
+            </div>
             <div className="text-sm text-[#434146] font-semibold flex items-center gap-1">
               {customer.receivedAmount + customer.pendingReceivedAmount}
             </div>
@@ -51,10 +64,12 @@ const CustomerTable = ({ customer }) => {
               </div>
             </div>
             <div>
-              <ViewDetails
-                item={<ArrowRight color="#0C8B3F" />}
-                tooltip="View Details"
-              />
+              <Link href={`/customer/${customer._id}`}>
+                <ViewDetails
+                  item={<ArrowRight color="#0C8B3F" />}
+                  tooltip="View Details"
+                />
+              </Link>
             </div>
           </div>
         </div>
