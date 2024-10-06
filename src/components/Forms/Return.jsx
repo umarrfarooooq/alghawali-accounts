@@ -9,9 +9,11 @@ import axiosInstance from "@/utils/axios";
 import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
 import Message from "../ui/Message";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 const Return = () => {
   const { verifyToken } = VerifyStaffToken();
+  const router = useRouter();
   const [selectedMaidId, setSelectedMaidId] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [warningMessage, setWarningMessage] = useState("");
@@ -76,8 +78,12 @@ const Return = () => {
 
       if (response.status === 200) {
         toast({
-          description: "Maid return processed successfully",
+          description:
+            "Maid return processed successfully redirecting to add Transaction",
         });
+        setTimeout(() => {
+          router.push("/update-payment");
+        }, 1000);
       }
       setSpinningLoader(false);
     } catch (error) {

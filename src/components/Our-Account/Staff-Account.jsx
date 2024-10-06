@@ -31,6 +31,7 @@ const StaffAccount = ({ name, bg, svg, svgBg, amount, id }) => {
         />
         <CustomButton
           txt="View Balance Details"
+          link={`/transaction/staff-summary/${id}`}
           color="text-[#107243]"
           border="border border-[#107243]"
         />

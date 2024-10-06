@@ -10,9 +10,11 @@ import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
 import Message from "../ui/Message";
 import { useToast } from "@/hooks/use-toast";
 import { DatePicker } from "../New-Hiring/Date-Picker";
+import { useRouter } from "next/navigation";
 
 const Replace = () => {
   const { verifyToken } = VerifyStaffToken();
+  const router = useRouter();
   const [oldMaidId, setOldMaidId] = useState("");
   const [newMaidId, setNewMaidId] = useState("");
   const [replaceDate, setReplaceDate] = useState(null);
@@ -74,8 +76,11 @@ const Replace = () => {
 
       if (response.status === 200) {
         toast({
-          description: "Maid replaced successfully",
+          description: "Maid replaced successfully redirecting to Add Transaction",
         });
+        setTimeout(() => {
+          router.push("/update-payment");
+        }, 1000);
       }
       setSpinningLoader(false);
     } catch (error) {

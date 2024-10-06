@@ -98,6 +98,7 @@ const UpdatePaymentForm = () => {
           ? setPaymentAmount(totalReceived - totalAmount)
           : setPaymentAmount(totalAmount - totalReceived);
       }
+      
 
       setFormState((prev) => ({
         ...prev,
@@ -114,6 +115,7 @@ const UpdatePaymentForm = () => {
   const PaymentFields = useMemo(() => {
     return (
       <>
+      
         <div className="flex flex-col gap-1 w-full">
           <Label label="Payment Type" htmlFor="paymentType" />
           <Input

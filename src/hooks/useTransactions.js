@@ -84,6 +84,30 @@ const fetchMyTransactions = async (staffAccountId) => {
   return data;
 };
 
+const fetchMyBalanceDetails = async ({ staffAccountId }) => {
+  const { verifyToken } = VerifyStaffToken();
+  const { data } = await axiosInstance.get(`api/v1/transaction/my/summary`, {
+    headers: {
+      Authorization: `Bearer ${verifyToken}`,
+    },
+    params: { staffAccountId },
+  });
+  return data;
+};
+
+const fetchStaffBalanceDetails = async (staffId) => {
+  const { verifyToken } = VerifyStaffToken();
+  const { data } = await axiosInstance.get(
+    `api/v1/transaction/staff/${staffId}/summary`,
+    {
+      headers: {
+        Authorization: `Bearer ${verifyToken}`,
+      },
+    }
+  );
+  return data;
+};
+
 export const useAllPendingTransactions = ({ enabled }) => {
   return useQuery({
     queryKey: ["allPendingTransactions"],
@@ -137,5 +161,21 @@ export const useMyTransactions = (staffAccountId) => {
     queryKey: ["myTransactions", staffAccountId],
     queryFn: () => fetchMyTransactions(staffAccountId),
     enabled: !!staffAccountId,
+  });
+};
+
+export const useMyBalanceDetails = ({ staffAccountId }) => {
+  return useQuery({
+    queryKey: ["myBalanceDetails"],
+    queryFn: () => fetchMyBalanceDetails({ staffAccountId }),
+    enabled: !!staffAccountId,
+  });
+};
+
+export const useStaffBalanceDetails = (staffId) => {
+  return useQuery({
+    queryKey: ["staffBalanceDetails", staffId],
+    queryFn: () => fetchStaffBalanceDetails(staffId),
+    enabled: !!staffId,
   });
 };

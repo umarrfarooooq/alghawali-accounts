@@ -14,9 +14,11 @@ import Input from "../ui/Input";
 import Label from "../ui/Label";
 import SelectInput from "../ui/Select-Input";
 import { DatePicker } from "../New-Hiring/Date-Picker";
-import RecievedBy from "../Form-Components/Recieved-By";
 import Banks from "../New-Hiring/Banks";
 import PaymentSlip from "../New-Hiring/PaymentSlip";
+import StaffSelect from "../Form-Components/StaffSelect";
+import axiosInstance from "@/utils/axios";
+import { toast } from "@/hooks/use-toast";
 
 const EditTransaction = ({ transaction }) => {
   const [formState, setFormState] = useState(() => {
@@ -32,6 +34,7 @@ const EditTransaction = ({ transaction }) => {
     return {
       amount: transaction.amount,
       paymentMethod: paymentMethod,
+      type: transaction.type,
       date: transaction.date,
       description: transaction.description,
       proof: transaction.proof,
@@ -82,15 +85,66 @@ const EditTransaction = ({ transaction }) => {
       if (proofFile) {
         formData.append("proof", proofFile);
       }
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Form submitted:", Object.fromEntries(formData));
+      formData.append("transactionId", transaction._id);
+      const formDataToSend = Object.fromEntries(formData.entries());
+      const response = await axiosInstance.put(
+        `api/v1/transaction/editTransaction`,
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       setSpinningLoader(false);
+      if (response.status === 200) {
+        toast({
+          description: "Payment updated successfully",
+        });
+      }
     } catch (error) {
       setSpinningLoader(false);
-      setErrorMessage("An error occurred. Please try again.");
-      console.error("Error submitting form:", error);
+      handleError(error);
     }
+  };
+  const handleError = (error) => {
+    if (error.response) {
+      if (error.response.status === 400) {
+        setErrorMessage(
+          error.response.data.error ||
+            "Validation error. Please check your input."
+        );
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.response.data.error,
+        });
+      } else if (error.response.status === 401) {
+        setErrorMessage("Unauthorized. Please log in again.");
+      } else if (error.response.status === 404) {
+        setErrorMessage("Something not found. Please try again.");
+      } else if (error.response.status === 500) {
+        setErrorMessage("Server error. Please try again later.");
+      } else {
+        setErrorMessage(
+          `An error occurred: ${
+            error.response.data.message || "Please try again."
+          }`
+        );
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.response.data.message || "Please try again.",
+        });
+      }
+    } else if (error.request) {
+      setErrorMessage(
+        "No response from server. Please check your internet connection."
+      );
+    } else {
+      setErrorMessage("An error occurred. Please try again.");
+    }
+    console.error("Error submitting form:", error);
   };
   return (
     <Dialog>
@@ -145,9 +199,18 @@ const EditTransaction = ({ transaction }) => {
               />
             </div>
             <div className="flex flex-col gap-1 w-full">
-              <RecievedBy
+              <StaffSelect
                 handleSelectChange={handleSelectChange}
-                receivedValue={formState.receivedBy}
+                selectedValue={
+                  formState.type === "Received"
+                    ? formState.receivedBy
+                    : formState.sendedBy
+                }
+                label={formState.type === "Received" ? "Received By" : "Sent By"}
+                name={formState.type === "Received" ? "receivedBy" : "sendedBy"}
+                placeholder={`Select ${
+                  formState.type === "Received" ? "receiver" : "sender"
+                }...`}
               />
             </div>
             <Banks
