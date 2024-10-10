@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Pencil, Save, X } from "lucide-react";
+import { Send } from "lucide-react";
 import Input from "../ui/Input";
 import Label from "../ui/Label";
 import SelectInput from "../ui/Select-Input";
@@ -20,33 +20,23 @@ import StaffSelect from "../Form-Components/StaffSelect";
 import axiosInstance from "@/utils/axios";
 import { toast } from "@/hooks/use-toast";
 import Message from "../ui/Message";
+import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
 
-const EditTransaction = ({ transaction }) => {
-  const [formState, setFormState] = useState(() => {
-    let paymentMethod = transaction.paymentMethod;
-    let selectedBank = transaction.selectedBank || "";
+const TransferAmount = () => {
+  const { staffAccountId } = VerifyStaffToken();
 
-    if (paymentMethod.includes("(")) {
-      const [method, bank] = paymentMethod.split("(");
-      paymentMethod = method.trim();
-      selectedBank = bank.replace(")", "").trim();
-    }
-
-    return {
-      amount: transaction.amount,
-      paymentMethod: paymentMethod,
-      type: transaction.type,
-      date: transaction.date,
-      description: transaction.description,
-      proof: transaction.proof,
-      receivedBy: transaction.receivedBy?._id,
-      sendedBy: transaction.sendedBy?._id,
-      selectedBank: selectedBank,
-    };
+  const [formState, setFormState] = useState({
+    receiverId: "",
+    amount: "",
+    paymentMethod: "",
+    selectedBank: "",
+    description: "",
+    date: new Date(),
   });
   const [errorMessage, setErrorMessage] = useState("");
   const [spinningLoader, setSpinningLoader] = useState(false);
   const [proofFile, setProofFile] = useState(null);
+
   const handleSelectChange = (name, value) => {
     setFormState((prev) => ({
       ...prev,
@@ -62,45 +52,44 @@ const EditTransaction = ({ transaction }) => {
   const handleDateChange = (date) => {
     setFormState((prev) => ({ ...prev, date: date }));
   };
+
   const handleProofChange = (file) => {
     setProofFile(file);
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
     setSpinningLoader(true);
 
     try {
-      const submitPaymentMethod =
-        formState.paymentMethod === "Bank Transfer"
-          ? `${formState.paymentMethod} (${formState.selectedBank})`
-          : formState.paymentMethod;
-
       const formData = new FormData();
       Object.entries(formState).forEach(([key, value]) => {
         if (value !== null && value !== undefined) {
           formData.append(key, value);
         }
       });
-      formData.append("paymentMethod", submitPaymentMethod);
       if (proofFile) {
         formData.append("proof", proofFile);
       }
-      formData.append("transactionId", transaction._id);
-      const formDataToSend = Object.fromEntries(formData.entries());
-      const response = await axiosInstance.put(
-        `api/v1/transaction/editTransaction`,
-        formDataToSend,
+      const formDataObj = Object.fromEntries(formData.entries());
+      console.log(formDataObj);
+      const response = await axiosInstance.post(
+        `api/v1/staffAccounts/transfer-amount`,
+        formDataObj,
         {
           headers: {
             "Content-Type": "multipart/form-data",
+          },
+          params: {
+            staffAccountId,
           },
         }
       );
       setSpinningLoader(false);
       if (response.status === 200) {
         toast({
-          description: "Payment updated successfully",
+          description: "Amount transferred successfully",
         });
       }
     } catch (error) {
@@ -108,36 +97,15 @@ const EditTransaction = ({ transaction }) => {
       handleError(error);
     }
   };
+
   const handleError = (error) => {
     if (error.response) {
-      if (error.response.status === 400) {
-        setErrorMessage(
-          error.response.data.error ||
-            "Validation error. Please check your input."
-        );
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: error.response.data.error,
-        });
-      } else if (error.response.status === 401) {
-        setErrorMessage("Unauthorized. Please log in again.");
-      } else if (error.response.status === 404) {
-        setErrorMessage("Something not found. Please try again.");
-      } else if (error.response.status === 500) {
-        setErrorMessage("Server error. Please try again later.");
-      } else {
-        setErrorMessage(
-          `An error occurred: ${
-            error.response.data.message || "Please try again."
-          }`
-        );
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: error.response.data.message || "Please try again.",
-        });
-      }
+      setErrorMessage(error.response.data.error || "An error occurred");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.response.data.error || "An error occurred",
+      });
     } else if (error.request) {
       setErrorMessage(
         "No response from server. Please check your internet connection."
@@ -147,28 +115,38 @@ const EditTransaction = ({ transaction }) => {
     }
     console.error("Error submitting form:", error);
   };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
         <CustomButton
           disableLoadingOnClick={true}
           className="w-full md:w-max"
-          icon={<Pencil size={16} color="#107243" />}
-          txt="Edit"
+          icon={<Send size={16} color="#107243" />}
+          txt="Transfer Amount"
           color="text-[#107243]"
           border="border border-[#107243]"
         />
       </DialogTrigger>
       <DialogContent className="bg-[#FFFBFA] border border-[#EBEBEB] w-full lg:max-w-[38rem] lg:min-w-[38rem] mx-auto p-3 sm:p-8 rounded-2xl overflow-y-scroll max-h-[85vh]">
         <DialogHeader>
-          <DialogTitle>Edit Transaction</DialogTitle>
+          <DialogTitle>Transfer Amount</DialogTitle>
           <DialogDescription>
-            Make changes to your transaction here. Click save when you are done.
+            Transfer amount to another staff member. Fill in the details below.
           </DialogDescription>
         </DialogHeader>
         <div className="bg-[#F2F5FF] rounded-lg p-3 sm:p-8">
           {errorMessage && <Message type="error" message={errorMessage} />}
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1 w-full">
+              <StaffSelect
+                handleSelectChange={handleSelectChange}
+                selectedValue={formState.receiverId}
+                label="Receiver"
+                name="receiverId"
+                placeholder="Select receiver..."
+              />
+            </div>
             <div className="flex flex-col gap-1">
               <Label label="Amount" htmlFor="amount" />
               <Input
@@ -192,30 +170,13 @@ const EditTransaction = ({ transaction }) => {
                 onChange={(value) => handleSelectChange("paymentMethod", value)}
               />
             </div>
-            <div className="flex flex-col gap-1 w-full">
-              <StaffSelect
-                handleSelectChange={handleSelectChange}
-                selectedValue={
-                  formState.type === "Received"
-                    ? formState.receivedBy
-                    : formState.sendedBy
-                }
-                label={
-                  formState.type === "Received" ? "Received By" : "Sent By"
-                }
-                name={formState.type === "Received" ? "receivedBy" : "sendedBy"}
-                placeholder={`Select ${
-                  formState.type === "Received" ? "receiver" : "sender"
-                }...`}
-              />
-            </div>
             <Banks
               paymentMethod={formState.paymentMethod}
               selectedBank={formState.selectedBank}
               handleSelectChange={handleSelectChange}
             />
             <div className="flex flex-col gap-1">
-              <Label label="Transaction Date" htmlFor="date" />
+              <Label label="Transfer Date" htmlFor="date" />
               <DatePicker
                 setHiringDate={handleDateChange}
                 defaultDate={formState.date}
@@ -238,18 +199,13 @@ const EditTransaction = ({ transaction }) => {
                 onFileChange={handleProofChange}
                 className="mb-4"
                 iconClassName="w-6 h-6 mb-2 text-green-500"
-                initialPreview={
-                  transaction.proof
-                    ? `${process.env.NEXT_PUBLIC_API_URL}${transaction.proof}`
-                    : null
-                }
               />
             </div>
             <CustomButton
               type="submit"
               loading={spinningLoader}
-              icon={<Save size={20} />}
-              txt="Save Changes"
+              icon={<Send size={20} />}
+              txt="Transfer Amount"
               bg="bg-[#107243]"
               color="text-[#FFFBFA]"
             />
@@ -260,4 +216,4 @@ const EditTransaction = ({ transaction }) => {
   );
 };
 
-export default EditTransaction;
+export default TransferAmount;

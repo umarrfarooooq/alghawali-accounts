@@ -28,10 +28,18 @@ const CustomerTable = ({ customer }) => {
               {customer.customerName}
             </div>
           </div>
-          <div>
+          {/* <div>
             <div className="text-xs text-[#434146]">Phone Number</div>
             <div className="text-sm text-[#434146] font-semibold">
               {customer.phoneNo}
+            </div>
+          </div> */}
+          <div>
+            <div className="text-xs text-[#434146]">Last Transaction Date</div>
+            <div className="text-sm text-[#434146] font-semibold">
+              {customer.transactions && customer.transactions.length > 0
+                ? new Date(customer.transactions[customer.transactions.length - 1].date).toLocaleDateString()
+                : 'No transactions'}
             </div>
           </div>
           <div>

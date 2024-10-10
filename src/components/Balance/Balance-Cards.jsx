@@ -5,6 +5,7 @@ import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
 import { ArrowDown, ArrowUp, Wallet } from "lucide-react";
 import CustomLoading from "../ui/CustomLoading";
 import CustomButton from "../ui/CustomBtn";
+import TransferAmount from "../Forms/Transfer-Amount";
 
 const BalanceCards = () => {
   const { staffId } = VerifyStaffToken();
@@ -29,19 +30,25 @@ const BalanceCards = () => {
 
   return (
     <div className="rounded-xl flex flex-col gap-4 border border-[#031d921a] bg-[#FFFBFA] p-4 md:p-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 md:gap-6 gap-4">
-        <CustomButton
-          link="/transaction/my"
-          txt="View Transactions"
-          color="text-[#107243]"
-          border="border border-[#107243]"
-        />
-        <CustomButton
-          link="/transaction/my-summary"
-          txt="View Balance Details"
-          color="text-[#107243]"
-          border="border border-[#107243]"
-        />
+      <div className="flex md:items-center flex-col md:flex-row justify-between gap-4 md:gap-6">
+        <div className="text-lg md:text-2xl font-bold">My Account</div>
+        <div className="flex flex-col md:flex-row gap-2">
+          <CustomButton
+            link="/transaction/my"
+            txt="View Transactions"
+            className="w-full md:w-max"
+            color="text-[#107243]"
+            border="border border-[#107243]"
+          />
+          <CustomButton
+            link="/transaction/my-summary"
+            txt="View Balance Details"
+            className="w-full md:w-max"
+            color="text-[#107243]"
+            border="border border-[#107243]"
+          />
+          <TransferAmount />
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 md:gap-6 gap-4">
         <BalanceCard

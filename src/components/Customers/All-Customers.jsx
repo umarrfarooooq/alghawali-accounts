@@ -9,18 +9,18 @@ import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
 import roles from "@/lib/roles";
 import CustomLoading from "../ui/CustomLoading";
 
-const AllCustomers = () => {
+const AllCustomers = ({ searchTerm }) => {
   const { roles: staffRoles, staffAccountId } = VerifyStaffToken();
 
   const accessCheck = staffRoles.includes(roles.fullAccessOnAccounts);
 
   const { data: allCustomerAccounts, isLoading: loadingAllCustomers } =
-    useAllCustomerAccounts("", {
+    useAllCustomerAccounts(searchTerm, {
       enabled: accessCheck,
     });
 
   const { data: myCustomerAccounts, isLoading: loadingMyCustomers } =
-    useMyCustomerAccounts("", staffAccountId, {
+    useMyCustomerAccounts(searchTerm, staffAccountId, {
       enabled: !accessCheck && !!staffAccountId,
     });
 

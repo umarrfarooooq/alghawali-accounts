@@ -31,6 +31,7 @@ const NewHiredForm = () => {
     paymentMethod: "",
     receivedBy: "",
     selectedBank: "",
+    agencyType: "Alghawali",
   });
 
   const [totalAmount, setTotalAmount] = useState(0);
@@ -330,6 +331,55 @@ const NewHiredForm = () => {
                   name="trialDuration"
                   id="trialDuration"
                   type="number"
+                />
+              </div>
+            )}
+            {hiringType === "On Trial" && (
+              <div className="flex flex-col gap-1">
+                <Label label="Passport Number" htmlFor="passportNumber" />
+                <Input
+                  placeholder="Passport Number"
+                  name="passportNumber"
+                  id="passportNumber"
+                  type="text"
+                />
+              </div>
+            )}
+            {hiringType === "On Trial" && (
+              <div className="flex flex-col gap-1">
+                <Label
+                  label="Customer Id Card Number"
+                  htmlFor="customerIdCard"
+                />
+                <Input
+                  placeholder="Customer Id Card Number"
+                  name="customerIdCard"
+                  id="customerIdCard"
+                  type="text"
+                />
+              </div>
+            )}
+            {hiringType === "On Trial" && (
+              <div className="flex flex-col gap-1">
+                <Label label="Salary" htmlFor="salary" />
+                <Input
+                  placeholder="Salary"
+                  name="salary"
+                  id="salary"
+                  type="number"
+                />
+              </div>
+            )}
+            {hiringType === "On Trial" && (
+              <div className="flex flex-col gap-1">
+                <Label label="Agency Type" htmlFor="agencyType" />
+                <SelectInput
+                  selectValue={formState.agencyType}
+                  options={[
+                    { value: "Alghawali", label: "Alghawali" },
+                    { value: "Swift", label: "Swift" },
+                  ]}
+                  onChange={(value) => handleSelectChange("agencyType", value)}
                 />
               </div>
             )}

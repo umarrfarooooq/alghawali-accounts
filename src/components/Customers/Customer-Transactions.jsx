@@ -5,7 +5,6 @@ import CustomLoading from "../ui/CustomLoading";
 
 const CustomerTransactions = ({ customerId }) => {
   const { data, isLoading, isError } = useCustomerTransactions(customerId);
-  console.log(data);
   if (isLoading) {
     return <CustomLoading />;
   }

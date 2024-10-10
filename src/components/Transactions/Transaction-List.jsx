@@ -46,10 +46,10 @@ const TransactionList = ({ transaction }) => {
               {transaction?.type && (
                 <span>
                   {transaction.type === "Received" && (
-                    <ArrowUp size={16} color="#0C8B3F" />
+                    <ArrowDown size={16} color="#0C8B3F" />
                   )}
                   {transaction.type === "Sent" && (
-                    <ArrowDown size={16} color="#f52828" />
+                    <ArrowUp size={16} color="#f52828" />
                   )}
                 </span>
               )}

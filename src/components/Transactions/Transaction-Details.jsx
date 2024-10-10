@@ -1,6 +1,6 @@
 "use client";
-import React from "react";
-import { Check, Clock, Eye, X } from "lucide-react";
+import React, { useState } from "react";
+import { Check, Clock, X } from "lucide-react";
 import { useTransactionById } from "@/hooks/useTransactions";
 import CustomButton from "../ui/CustomBtn";
 import CustomLoading from "../ui/CustomLoading";
@@ -8,9 +8,15 @@ import axiosInstance from "@/utils/axios";
 import EditTransaction from "../Forms/Edit-Transaction";
 import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
 import roles from "@/lib/roles";
+import ConfirmationModal from "../ui/Modal";
+import { useToast } from "@/hooks/use-toast";
 const TransactionDetailsComponent = ({ id }) => {
   const { roles: staffRoles } = VerifyStaffToken();
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
   const hasPermission = staffRoles.includes(roles.fullAccessOnAccounts);
+  const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
+  const [isDeclineModalOpen, setIsDeclineModalOpen] = useState(false);
   const { data: transaction, isLoading, error } = useTransactionById(id);
   if (isLoading) {
     return (
@@ -24,6 +30,7 @@ const TransactionDetailsComponent = ({ id }) => {
     return <div>Error loading transaction details</div>;
   }
   const handleApprove = async () => {
+    setLoading(true);
     try {
       const response = await axiosInstance.post(
         "/api/v1/transaction/handlePendingTransaction",
@@ -34,12 +41,20 @@ const TransactionDetailsComponent = ({ id }) => {
       );
 
       console.log("Transaction approved:", response.data);
+      toast({
+        title: "Transaction approved",
+        description: "The transaction has been approved successfully",
+      });
+      setIsAcceptModalOpen(false);
     } catch (error) {
       console.error("Error approving transaction:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDecline = async () => {
+    setLoading(true);
     try {
       const response = await axiosInstance.post(
         "/api/v1/transaction/handlePendingTransaction",
@@ -50,14 +65,18 @@ const TransactionDetailsComponent = ({ id }) => {
       );
 
       console.log("Transaction declined:", response.data);
+      toast({
+        title: "Transaction declined",
+        description: "The transaction has been declined successfully",
+      });
+      setIsDeclineModalOpen(false);
     } catch (error) {
       console.error("Error declining transaction:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleEdit = () => {
-    console.log("Edit");
-  };
   const formattedDate = new Date(transaction.date).toLocaleDateString();
   return (
     <>
@@ -66,7 +85,6 @@ const TransactionDetailsComponent = ({ id }) => {
           <div className="flex justify-end">
             <CustomButton
               className="w-max mb-4"
-              loading={false}
               disableLoadingOnClick={true}
               icon={
                 transaction.status === "Pending" ? (
@@ -188,51 +206,81 @@ const TransactionDetailsComponent = ({ id }) => {
                 </div>
               </div>
             )}
-            <div>
-              <div className="text-xs text-[#434146]">Invoice Number</div>
-              <div className="text-sm text-[#434146] font-semibold flex items-center gap-1">
-                {transaction.invoice?.number}{" "}
+            {transaction.invoice?.number && (
+              <div>
+                <div className="text-xs text-[#434146]">Invoice Number</div>
+                <div className="text-sm text-[#434146] font-semibold flex items-center gap-1">
+                  {transaction.invoice?.number}{" "}
+                </div>
               </div>
-            </div>
-            <div>
-              <div className="text-xs text-[#434146]">Invoice PDF</div>
-              <div className="text-sm text-[#434146] font-semibold flex items-center gap-1">
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={`${process.env.NEXT_PUBLIC_API_URL}uploads/${transaction.invoice?.path}`}
-                  className="cursor-pointer underline "
-                >
-                  view invoice
-                </a>
+            )}
+            {transaction.invoice?.path && (
+              <div>
+                <div className="text-xs text-[#434146]">Invoice PDF</div>
+                <div className="text-sm text-[#434146] font-semibold flex items-center gap-1">
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={`${process.env.NEXT_PUBLIC_API_URL}uploads/${transaction.invoice?.path}`}
+                    className="cursor-pointer underline "
+                  >
+                    view invoice
+                  </a>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
-        {}
-        <div className="flex justify-end gap-2 mt-4">
-          {transaction.status === "Pending" && (
-            <>
-              <CustomButton
-                onClick={handleApprove}
-                className="w-full md:w-max"
-                icon={<Check size={16} color="#107243" />}
-                txt="Approve"
-                color="text-[#107243]"
-                border="border border-[#107243]"
-              />
-              <CustomButton
-                onClick={handleDecline}
-                className="w-full md:w-max"
-                icon={<X size={16} color="#f56565" />}
-                txt="Decline"
-                color="text-[#f56565]"
-                border="border border-[#f56565]"
-              />
-            </>
-          )}
-          {hasPermission && <EditTransaction transaction={transaction} />}
-        </div>
+        {hasPermission && (
+          <div className="flex justify-end gap-2 mt-4">
+            {transaction.status === "Pending" && (
+              <>
+                <CustomButton
+                  onClick={() => setIsAcceptModalOpen(true)}
+                  className="w-full md:w-max"
+                  disableLoadingOnClick={true}
+                  icon={<Check size={16} color="#107243" />}
+                  txt="Approve"
+                  color="text-[#107243]"
+                  border="border border-[#107243]"
+                />
+                <CustomButton
+                  onClick={() => setIsDeclineModalOpen(true)}
+                  className="w-full md:w-max"
+                  disableLoadingOnClick={true}
+                  icon={<X size={16} color="#f56565" />}
+                  txt="Decline"
+                  color="text-[#f56565]"
+                  border="border border-[#f56565]"
+                />
+              </>
+            )}
+
+            {hasPermission && <EditTransaction transaction={transaction} />}
+            <ConfirmationModal
+              isOpen={isAcceptModalOpen}
+              onClose={() => setIsAcceptModalOpen(false)}
+              onConfirm={handleApprove}
+              loading={loading}
+              title="Approve Transaction"
+              description="Are you sure you want to approve this transaction?"
+              confirmText="Approve"
+              confirmClass="bg-[#107243] hover:bg-[#107243]"
+              cancelText="Cancel"
+            />
+            <ConfirmationModal
+              isOpen={isDeclineModalOpen}
+              onClose={() => setIsDeclineModalOpen(false)}
+              onConfirm={handleDecline}
+              loading={loading}
+              title="Decline Transaction"
+              description="Are you sure you want to decline this transaction?"
+              confirmText="Decline"
+              confirmClass="bg-[#f56565] hover:bg-[#f56565]"
+              cancelText="Cancel"
+            />
+          </div>
+        )}
       </div>
     </>
   );

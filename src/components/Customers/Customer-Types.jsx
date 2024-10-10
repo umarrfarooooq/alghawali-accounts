@@ -7,6 +7,7 @@ import PendingDues from "./Pending-Dues";
 
 const CustomerTypes = () => {
   const [activeTab, setActiveTab] = useState("All Costumers");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const tabItems = [
     {
@@ -26,6 +27,11 @@ const CustomerTypes = () => {
   const handleTabClick = (key) => {
     setActiveTab(key);
   };
+
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+  };
+
   return (
     <>
       <div className="rounded-xl bg-[#FFFBFA] border border-[#031d921a] p-4 md:p-6 flex flex-col gap-4 md:gap-6">
@@ -41,9 +47,9 @@ const CustomerTypes = () => {
               <div className="text-[#262F32] font-bold text-2xl">
                 All Customers <span className="font-normal">122</span>
               </div>
-              <SearchComponent />
+              <SearchComponent onSearch={handleSearch} />
             </div>
-            <AllCustomers />
+            <AllCustomers searchTerm={searchTerm} />
           </>
         )}
         {activeTab === "Costumers Pending Dues" && <PendingDues />}
