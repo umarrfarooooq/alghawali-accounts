@@ -132,6 +132,20 @@ const fetchMyClearedPayments = async (customerId) => {
   return data;
 };
 
+const fetchStaffAnalytics = async (startDate, endDate) => {
+  const { verifyToken } = VerifyStaffToken();
+  const { data } = await axiosInstance.get(
+    `api/v2/customers/staff-sales-analytics`,
+    {
+      headers: {
+        Authorization: `Bearer ${verifyToken}`,
+      },
+      params: { startDate, endDate },
+    }
+  );
+  return data;
+};
+
 export const useAllCustomerAccounts = (searchTerm, { enabled }) => {
   return useQuery({
     queryKey: ["allCustomerAccounts", searchTerm],
@@ -208,6 +222,14 @@ export const useMyClearedPayments = (customerId, { enabled }) => {
   return useQuery({
     queryKey: ["myClearedPayments", customerId],
     queryFn: () => fetchMyClearedPayments(customerId),
+    enabled,
+  });
+};
+
+export const useStaffAnalytics = (startDate, endDate, { enabled }) => {
+  return useQuery({
+    queryKey: ["staffAnalytics", startDate, endDate],
+    queryFn: () => fetchStaffAnalytics(startDate, endDate),
     enabled,
   });
 };

@@ -2,44 +2,46 @@ import axiosInstance from "@/utils/axios";
 import { useQuery } from "@tanstack/react-query";
 import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
 
-const fetchAllPendingTransactions = async () => {
+const fetchAllPendingTransactions = async (searchTerm = "") => {
   const { verifyToken } = VerifyStaffToken();
   const { data } = await axiosInstance.get(`/api/v1/transaction/pending`, {
     headers: {
       Authorization: `Bearer ${verifyToken}`,
     },
+    params: { searchTerm },
   });
   return data;
 };
 
-const fetchAllRecentTransactions = async () => {
+const fetchAllRecentTransactions = async (searchTerm = "") => {
   const { verifyToken } = VerifyStaffToken();
   const { data } = await axiosInstance.get(`/api/v1/transaction/recent`, {
     headers: {
       Authorization: `Bearer ${verifyToken}`,
     },
+    params: { searchTerm },
   });
   return data;
 };
 
-const fetchMyPendingTransactions = async (staffAccountId) => {
+const fetchMyPendingTransactions = async (staffAccountId, searchTerm = "") => {
   const { verifyToken } = VerifyStaffToken();
   const { data } = await axiosInstance.get(`/api/v1/transaction/my/pending`, {
     headers: {
       Authorization: `Bearer ${verifyToken}`,
     },
-    params: { staffAccountId },
+    params: { staffAccountId, searchTerm },
   });
   return data;
 };
 
-const fetchMyRecentTransactions = async (staffAccountId) => {
+const fetchMyRecentTransactions = async (staffAccountId, searchTerm = "") => {
   const { verifyToken } = VerifyStaffToken();
   const { data } = await axiosInstance.get(`/api/v1/transaction/my/recent`, {
     headers: {
       Authorization: `Bearer ${verifyToken}`,
     },
-    params: { staffAccountId },
+    params: { staffAccountId, searchTerm },
   });
   return data;
 };
@@ -108,34 +110,40 @@ const fetchStaffBalanceDetails = async (staffId) => {
   return data;
 };
 
-export const useAllPendingTransactions = ({ enabled }) => {
+export const useAllPendingTransactions = ({ enabled, searchTerm = "" }) => {
   return useQuery({
-    queryKey: ["allPendingTransactions"],
-    queryFn: fetchAllPendingTransactions,
+    queryKey: ["allPendingTransactions", searchTerm],
+    queryFn: () => fetchAllPendingTransactions(searchTerm),
     enabled,
   });
 };
 
-export const useAllRecentTransactions = ({ enabled }) => {
+export const useAllRecentTransactions = ({ enabled, searchTerm = "" }) => {
   return useQuery({
-    queryKey: ["allRecentTransactions"],
-    queryFn: fetchAllRecentTransactions,
+    queryKey: ["allRecentTransactions", searchTerm],
+    queryFn: () => fetchAllRecentTransactions(searchTerm),
     enabled,
   });
 };
 
-export const useMyPendingTransactions = (staffAccountId, { enabled }) => {
+export const useMyPendingTransactions = (
+  staffAccountId,
+  { enabled, searchTerm = "" }
+) => {
   return useQuery({
-    queryKey: ["myPendingTransactions", staffAccountId],
-    queryFn: () => fetchMyPendingTransactions(staffAccountId),
+    queryKey: ["myPendingTransactions", staffAccountId, searchTerm],
+    queryFn: () => fetchMyPendingTransactions(staffAccountId, searchTerm),
     enabled,
   });
 };
 
-export const useMyRecentTransactions = (staffAccountId, { enabled }) => {
+export const useMyRecentTransactions = (
+  staffAccountId,
+  { enabled, searchTerm = "" }
+) => {
   return useQuery({
-    queryKey: ["myRecentTransactions", staffAccountId],
-    queryFn: () => fetchMyRecentTransactions(staffAccountId),
+    queryKey: ["myRecentTransactions", staffAccountId, searchTerm],
+    queryFn: () => fetchMyRecentTransactions(staffAccountId, searchTerm),
     enabled,
   });
 };

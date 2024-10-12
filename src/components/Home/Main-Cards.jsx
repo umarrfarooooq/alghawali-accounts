@@ -1,50 +1,63 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import MainCard from "@/components/Main-Card/Main-Card";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowDown, ArrowUp, Clock, IdCard, Shirt } from "lucide-react";
+import { ArrowDown, ArrowUp, Clock } from "lucide-react";
 import axiosInstance from "@/utils/axios";
 import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
 import AmountPeriod from "../Main-Card/amountPeriod";
 import CustomLoading from "../ui/CustomLoading";
 import roles from "@/lib/roles";
-const fetchCardData = async (period) => {
+
+const fetchCardData = async (periodData) => {
   const { verifyToken } = VerifyStaffToken();
-  const { data } = await axiosInstance.get(
-    "api/v1/staffAccounts/all-transactions",
-    {
-      headers: {
-        Authorization: `Bearer ${verifyToken}`,
-      },
-      params: { period },
-    }
-  );
-  return data;
+  try {
+    const params =
+      periodData.type === "dateRange"
+        ? {
+            startDate: periodData.startDate,
+            endDate: periodData.endDate,
+          }
+        : { period: periodData.period };
+
+    const { data } = await axiosInstance.get(
+      "api/v1/staffAccounts/all-transactions",
+      {
+        headers: {
+          Authorization: `Bearer ${verifyToken}`,
+        },
+        params: params,
+      }
+    );
+    return data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
 };
 
 const MainCards = () => {
   const { roles: staffRoles } = VerifyStaffToken();
   const fullAccess = staffRoles.includes(roles.fullAccessOnAccounts);
-  const [selectedPeriod, setSelectedPeriod] = useState("Monthly");
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["cardData", selectedPeriod],
-    queryFn: () => fetchCardData(selectedPeriod),
-    enabled: fullAccess,
+  const [periodData, setPeriodData] = useState({
+    type: "period",
+    period: "Monthly",
+  });
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["cardData", periodData],
+    queryFn: () => fetchCardData(periodData),
+    enabled: fullAccess && periodData.type !== "custom",
     staleTime: 300000,
     retry: 2,
   });
 
-  useEffect(() => {
-    if (fullAccess) refetch();
-  }, [selectedPeriod, fullAccess]);
+  const handlePeriodChange = (newPeriodData) => {
+    setPeriodData(newPeriodData);
+  };
 
-  if (!fullAccess) return <></>;
+  if (!fullAccess) return null;
 
-  if (isLoading)
-    return (
-      <div>
-        <CustomLoading />
-      </div>
-    );
+  if (isLoading) return <CustomLoading />;
   if (isError) return <div>Error fetching data.</div>;
 
   const {
@@ -57,15 +70,19 @@ const MainCards = () => {
     totalPendingSent,
     totalPendingReceivedTillNow,
     totalPendingSentTillNow,
-  } = data;
+  } = data || {};
 
   return (
     <div className="px-4 md:px-8">
       <div className="rounded-xl bg-[#FFFBFA] border border-[#031d921a] p-4 md:p-6">
-        <div className="flex items-end justify-end">
+        <div className="flex items-end justify-end mb-4">
           <AmountPeriod
-            onPeriodChange={setSelectedPeriod}
-            selectedPeriod={selectedPeriod}
+            onPeriodChange={handlePeriodChange}
+            selectedPeriod={
+              periodData.type === "period" ? periodData.period : "custom"
+            }
+            startDate={data?.startDate}
+            endDate={data?.endDate}
           />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
@@ -73,7 +90,9 @@ const MainCards = () => {
             bg="bg-[#88ff7d1a]"
             svgBg="bg-[#88FF7D]"
             title="Available Balance"
-            selectedPeriod={selectedPeriod}
+            selectedPeriod={
+              periodData.type === "period" ? periodData.period : "custom"
+            }
             amount={totalBalance}
             totalTillNow={totalTillNowReceived - totalTillNowSent}
           />
@@ -82,7 +101,9 @@ const MainCards = () => {
             svgBg="bg-[#C446FF]"
             svg={<ArrowDown color="#FFFBFA" />}
             title="Total Received"
-            selectedPeriod={selectedPeriod}
+            selectedPeriod={
+              periodData.type === "period" ? periodData.period : "custom"
+            }
             amount={totalReceived}
             totalTillNow={totalTillNowReceived}
           />
@@ -91,17 +112,20 @@ const MainCards = () => {
             svgBg="bg-[#FF4646]"
             svg={<ArrowUp color="#FFFBFA" />}
             title="Total Sent"
-            selectedPeriod={selectedPeriod}
+            selectedPeriod={
+              periodData.type === "period" ? periodData.period : "custom"
+            }
             amount={totalSent}
             totalTillNow={totalTillNowSent}
           />
-
           <MainCard
             bg="bg-[#ffa64d1a]"
             svgBg="bg-[#FFA64D]"
             svg={<Clock color="#FFFBFA" />}
             title="Pending Received"
-            selectedPeriod={selectedPeriod}
+            selectedPeriod={
+              periodData.type === "period" ? periodData.period : "custom"
+            }
             amount={totalPendingReceived}
             totalTillNow={totalPendingReceivedTillNow}
           />
@@ -110,7 +134,9 @@ const MainCards = () => {
             svgBg="bg-[#4D9FFF]"
             svg={<Clock color="#FFFBFA" />}
             title="Pending Sent"
-            selectedPeriod={selectedPeriod}
+            selectedPeriod={
+              periodData.type === "period" ? periodData.period : "custom"
+            }
             amount={totalPendingSent}
             totalTillNow={totalPendingSentTillNow}
           />

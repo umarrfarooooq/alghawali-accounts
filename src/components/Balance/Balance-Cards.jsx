@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import BalanceCard from "@/components/Balance/Balance-Card";
 import { useStaffAccount } from "@/hooks/useStaffAccount";
 import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
-import { ArrowDown, ArrowUp, Wallet } from "lucide-react";
+import { ArrowDown, ArrowUp, Wallet, BarChart } from "lucide-react";
 import CustomLoading from "../ui/CustomLoading";
 import CustomButton from "../ui/CustomBtn";
 import TransferAmount from "../Forms/Transfer-Amount";
-
+import FullAccess from "@/lib/FullAccess";
 const BalanceCards = () => {
   const { staffId } = VerifyStaffToken();
   const [period, setPeriod] = useState("Monthly");
@@ -30,7 +30,7 @@ const BalanceCards = () => {
 
   return (
     <div className="rounded-xl flex flex-col gap-4 border border-[#031d921a] bg-[#FFFBFA] p-4 md:p-6">
-      <div className="flex md:items-center flex-col md:flex-row justify-between gap-4 md:gap-6">
+      <div className="flex flex-col gap-4 tab:flex-row tab:items-center justify-between">
         <div className="text-lg md:text-2xl font-bold">My Account</div>
         <div className="flex flex-col md:flex-row gap-2">
           <CustomButton
@@ -47,7 +47,18 @@ const BalanceCards = () => {
             color="text-[#107243]"
             border="border border-[#107243]"
           />
-          <TransferAmount />
+          <div className="flex gap-2 flex-col sm:flex-row">
+            <TransferAmount />
+            {FullAccess() && (
+              <CustomButton
+                link="staff-sales-analytics"
+                txt="Sales Analytics"
+                icon={<BarChart size={20} />}
+                bg="bg-[#107243]"
+                color="text-[#FFFBFA]"
+              />
+            )}
+          </div>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 md:gap-6 gap-4">

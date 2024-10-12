@@ -14,7 +14,6 @@ const StaffSummaryPage = ({ params }) => {
       </div>
     );
   if (error) return <div>Error: {error.message}</div>;
-  console.log(data);
   return (
     <AuthRedirect requireAuth={true} fullScreen={true}>
       <div className="bg-[#F2F5FF] min-h-screen">

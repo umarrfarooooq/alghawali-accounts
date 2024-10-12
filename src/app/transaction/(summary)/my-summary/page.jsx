@@ -16,7 +16,6 @@ const MySummaryPage = () => {
       </div>
     );
   if (error) return <div>Error: {error.message}</div>;
-  console.log(data);
   return (
     <AuthRedirect requireAuth={true}>
       <div className="bg-[#F2F5FF] min-h-screen">

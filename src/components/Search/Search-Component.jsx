@@ -2,7 +2,7 @@ import { Search } from "lucide-react";
 import React, { useState, useCallback } from "react";
 import debounce from "lodash/debounce";
 
-const SearchComponent = ({ onSearch }) => {
+const SearchComponent = ({ onSearch, placeholder }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const debouncedSearch = useCallback(
@@ -24,7 +24,7 @@ const SearchComponent = ({ onSearch }) => {
       <input
         className="outline-none w-full searchInput bg-transparent"
         type="text"
-        placeholder="Search"
+        placeholder={placeholder || "Search"}
         value={searchTerm}
         onChange={handleChange}
       />
