@@ -6,6 +6,7 @@ import {
   Trophy,
   Award,
   Medal,
+  CheckCircle,
 } from "lucide-react";
 
 const RankIcon = ({ rank }) => {
@@ -37,7 +38,7 @@ const StaffSalesAnalysis = ({ staffAnalytics }) => {
               </h3>
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div>
               <div className="text-xs text-gray-500">Total Customers</div>
               <div className="text-sm text-gray-800 font-semibold flex items-center gap-1">
@@ -50,6 +51,13 @@ const StaffSalesAnalysis = ({ staffAnalytics }) => {
               <div className="text-sm text-gray-800 font-semibold flex items-center gap-1">
                 <UserCheck size={16} className="text-green-500" />
                 <span>{staff.activeCustomers}</span>
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-gray-500">Completed Customers</div>
+              <div className="text-sm text-gray-800 font-semibold flex items-center gap-1">
+                <CheckCircle size={16} className="text-green-500" />
+                <span>{staff.completedCustomers}</span>
               </div>
             </div>
             <div>

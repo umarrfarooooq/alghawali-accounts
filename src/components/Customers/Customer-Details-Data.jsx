@@ -59,7 +59,7 @@ const CustomerDetailsData = ({ customer }) => {
               {customer.receivedAmount + customer.pendingReceivedAmount} OMR
             </div>
           </div>
-          
+
           <div>
             <div className="text-xs text-[#434146]">Unique Code</div>
             <div className="text-sm text-[#434146] font-semibold">
@@ -160,6 +160,13 @@ const CustomerDetailsData = ({ customer }) => {
                 <div className="text-xs text-[#434146]">Month End Date</div>
                 <div className="text-sm text-[#434146] font-semibold">
                   {formatDate(customer.monthlyHireEndDate)}
+                  {new Date(customer.monthlyHireEndDate) < new Date() && (
+                    <span className="text-[#FF0000]">
+                      {" "}
+                      (Expired{" "}
+                      {formatExpirationTime(customer.monthlyHireEndDate)})
+                    </span>
+                  )}
                 </div>
               </div>
             </>
