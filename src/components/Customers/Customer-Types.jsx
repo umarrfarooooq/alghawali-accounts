@@ -45,7 +45,7 @@ const CustomerTypes = () => {
           <>
             <div className="flex md:items-center md:justify-between flex-col md:flex-row gap-4">
               <div className="text-[#262F32] font-bold text-2xl">
-                All Customers <span className="font-normal">122</span>
+                All Customers <span className="font-normal"></span>
               </div>
               <SearchComponent onSearch={handleSearch} />
             </div>

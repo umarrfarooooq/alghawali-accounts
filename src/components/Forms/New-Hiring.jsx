@@ -8,16 +8,15 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { MaidSearch } from "../New-Hiring/Search-Maid";
 import SelectInput from "../ui/Select-Input";
 import { DatePicker } from "../New-Hiring/Date-Picker";
-import VisaChange from "../New-Hiring/VisaChange";
 import PaymentSlip from "../New-Hiring/PaymentSlip";
 import Banks from "../New-Hiring/Banks";
 import CustomButton from "../ui/CustomBtn";
 import RecievedBy from "../Form-Components/Recieved-By";
 import axiosInstance from "@/utils/axios";
 import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
-import UniformServiceAmount from "../New-Hiring/UniformService";
 import Message from "../ui/Message";
 import { useToast } from "@/hooks/use-toast";
+import ServicesSelection from "../Form-Components/ServicesSelection";
 const NewHiredForm = () => {
   const { verifyToken, staffAccountId } = VerifyStaffToken();
   const { toast } = useToast();
@@ -237,12 +236,6 @@ const NewHiredForm = () => {
               <Label label="Customer Phone #" htmlFor="cosPhone" />
               <Input placeholder="Phone Number" name="cosPhone" id="cosPhone" />
             </div>
-            <div>
-              <VisaChange />
-            </div>
-            <div>
-              <UniformServiceAmount />
-            </div>
             <div className="flex flex-col gap-1">
               <Label label="Total Amount" htmlFor="totalAmount" />
               <Input
@@ -383,6 +376,7 @@ const NewHiredForm = () => {
                 />
               </div>
             )}
+            <ServicesSelection />
             <div>
               <PaymentSlip />
             </div>

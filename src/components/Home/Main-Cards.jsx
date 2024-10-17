@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import MainCard from "@/components/Main-Card/Main-Card";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowDown, ArrowUp, Clock } from "lucide-react";
+import { ArrowDown, ArrowUp, Briefcase, Clock } from "lucide-react";
 import axiosInstance from "@/utils/axios";
 import { VerifyStaffToken } from "@/lib/VerifyStaffToken";
 import AmountPeriod from "../Main-Card/amountPeriod";
@@ -70,7 +70,23 @@ const MainCards = () => {
     totalPendingSent,
     totalPendingReceivedTillNow,
     totalPendingSentTillNow,
+    serviceTotals = {},
+    serviceTotalsAllTime = {},
   } = data || {};
+
+  const totalServices = serviceTotals
+    ? Object.keys(serviceTotals).reduce(
+        (sum, service) => sum + (serviceTotals[service] || 0),
+        0
+      )
+    : 0;
+
+  const totalServicesAllTime = serviceTotalsAllTime
+    ? Object.keys(serviceTotalsAllTime).reduce(
+        (sum, service) => sum + (serviceTotalsAllTime[service] || 0),
+        0
+      )
+    : 0;
 
   return (
     <div className="px-4 md:px-8">
@@ -139,6 +155,17 @@ const MainCards = () => {
             }
             amount={totalPendingSent}
             totalTillNow={totalPendingSentTillNow}
+          />
+          <MainCard
+            bg="bg-[#ff9f4d1a]"
+            svgBg="bg-[#FF9F4D]"
+            svg={<Briefcase color="#FFFBFA" />}
+            amount={totalServices}
+            totalTillNow={totalServicesAllTime}
+            title="Total Services"
+            selectedPeriod={
+              periodData.type === "period" ? periodData.period : "custom"
+            }
           />
         </div>
       </div>
