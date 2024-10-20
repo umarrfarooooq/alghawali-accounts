@@ -68,7 +68,7 @@ const CustomerTable = ({ customer }) => {
             <div>
               <div className="text-xs text-[#434146]">Profile Name</div>
               <div className="text-sm text-[#434146] font-semibold">
-                {customer.maid.name}
+                {customer.maid?.name}
               </div>
             </div>
             <div>
