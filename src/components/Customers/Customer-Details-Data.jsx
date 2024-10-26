@@ -1,14 +1,62 @@
-import React from "react";
+import React, { useState } from "react";
 import { formatDate, formatExpirationTime } from "@/utils/formatDate";
 import CustomButton from "../ui/CustomBtn";
+import { Check } from "lucide-react";
+import ConfirmationModal from "../ui/Modal";
+import axiosInstance from "@/utils/axios";
+import { useToast } from "@/hooks/use-toast";
 
 const CustomerDetailsData = ({ customer }) => {
+  const { toast } = useToast();
+  const [isMarkPermanentModalOpen, setIsMarkPermanentModalOpen] =
+    useState(false);
+  const [loading, setLoading] = useState(false);
+
   if (!customer) return null;
+  const handleMarkPermanent = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.post(
+        "api/v2/hiring/mark-permanent",
+        { customerAccountId: customer._id }
+      );
+
+      if (response.status === 200) {
+        toast({
+          description: "Trial successfully converted to permanent hire",
+        });
+      }
+    } catch (error) {
+      console.error("Error marking permanent:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          error.response?.data?.error ||
+          "An error occurred while marking permanent",
+      });
+    } finally {
+      setIsMarkPermanentModalOpen(false);
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="rounded-xl bg-[#FFFBFA] border border-[#031d921a] p-4 md:p-6 flex flex-col gap-4 md:gap-6">
       <div className="py-3">
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          {customer.profileHiringStatus === "On Trial" && (
+            <CustomButton
+              className="w-max mb-4"
+              icon={<Check size={20} />}
+              onClick={() => setIsMarkPermanentModalOpen(true)}
+              loading={false}
+              disableLoadingOnClick={true}
+              txt="Mark Permanent"
+              bg="bg-[#107243]"
+              color="text-[#FFFBFA]"
+            />
+          )}
           <CustomButton
             className="w-max mb-4"
             loading={false}
@@ -171,6 +219,17 @@ const CustomerDetailsData = ({ customer }) => {
               </div>
             </>
           )}
+          <ConfirmationModal
+            isOpen={isMarkPermanentModalOpen}
+            onClose={() => setIsMarkPermanentModalOpen(false)}
+            onConfirm={handleMarkPermanent}
+            loading={loading}
+            title="Mark Permanent"
+            description="Are you sure you want to mark this customer as permanent?"
+            confirmText="Mark Permanent"
+            confirmClass="bg-[#107243] hover:bg-[#107243]"
+            cancelText="Cancel"
+          />
         </div>
       </div>
     </div>

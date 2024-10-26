@@ -1,6 +1,12 @@
 import React from "react";
 
-const Tabs = ({ tabs, activeTab, onTabClick, className, tabClasses }) => {
+const Tabs = ({
+  tabs,
+  activeTab,
+  onTabClick,
+  className,
+  tabClasses,
+}) => {
   return (
     <div
       className={`bg-[#E3E3E3] overflow-auto border border-[#031d921a] rounded-xl md:px-6 px-4 py-2 w-full gap-2 md:flex md:items-center md:justify-between ${className}`}
