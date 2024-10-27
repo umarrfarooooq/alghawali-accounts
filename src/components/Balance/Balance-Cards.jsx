@@ -33,11 +33,7 @@ const BalanceCards = () => {
   const totalSentAmount =
     (staffAccount?.totalSentAmount || 0) +
     (staffAccount?.pendingSentAmount || 0);
-  const availableBalance =
-    (staffAccount?.receivedAmount || 0) +
-    (staffAccount?.pendingReceivedAmount || 0) -
-    (staffAccount?.sentAmount || 0) -
-    (staffAccount?.pendingSentAmount || 0);
+  const availableBalance = totalReceivedAmount - totalSentAmount;
 
   return (
     <div className="rounded-xl flex flex-col gap-4 border border-[#031d921a] bg-[#FFFBFA] p-4 md:p-6">
