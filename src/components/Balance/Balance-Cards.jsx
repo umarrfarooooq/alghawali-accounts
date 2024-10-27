@@ -15,7 +15,6 @@ const BalanceCards = () => {
     isLoading,
     error,
   } = useStaffAccount(staffId, period);
-
   if (isLoading)
     return (
       <div>
@@ -27,6 +26,18 @@ const BalanceCards = () => {
   const handlePeriodChange = (newPeriod) => {
     setPeriod(newPeriod);
   };
+
+  const totalReceivedAmount =
+    (staffAccount?.totalReceivedAmount || 0) +
+    (staffAccount?.pendingReceivedAmount || 0);
+  const totalSentAmount =
+    (staffAccount?.totalSentAmount || 0) +
+    (staffAccount?.pendingSentAmount || 0);
+  const availableBalance =
+    (staffAccount?.receivedAmount || 0) +
+    (staffAccount?.pendingReceivedAmount || 0) -
+    (staffAccount?.sentAmount || 0) -
+    (staffAccount?.pendingSentAmount || 0);
 
   return (
     <div className="rounded-xl flex flex-col gap-4 border border-[#031d921a] bg-[#FFFBFA] p-4 md:p-6">
@@ -63,7 +74,7 @@ const BalanceCards = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 md:gap-6 gap-4">
         <BalanceCard
-          amount={staffAccount.balance}
+          amount={availableBalance}
           title="Available Balance"
           svg={<Wallet />}
         />
@@ -71,14 +82,14 @@ const BalanceCards = () => {
           bg="bg-[#88ff7d1a]"
           svg={<ArrowDown />}
           svgBg="bg-[#88FF7D]"
-          amount={staffAccount.totalReceivedAmount}
+          amount={totalReceivedAmount}
           title="In"
         />
         <BalanceCard
           bg="bg-[#ff46460d]"
           svg={<ArrowUp color="#FFFBFA" />}
           svgBg="bg-[#FF4646]"
-          amount={staffAccount.totalSentAmount}
+          amount={totalSentAmount}
           title="Out"
         />
       </div>

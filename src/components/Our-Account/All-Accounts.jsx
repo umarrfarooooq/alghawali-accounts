@@ -50,7 +50,12 @@ const AllAccounts = () => {
               <StaffAccount
                 key={account.staffId || account._id}
                 name={account.staffName}
-                amount={account.balance}
+                amount={
+                  (account.receivedAmount || 0) +
+                  (account.pendingReceivedAmount || 0) -
+                  (account.sentAmount || 0) -
+                  (account.pendingSentAmount || 0)
+                }
                 id={account._id}
               />
             ))}

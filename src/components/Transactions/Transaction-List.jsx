@@ -3,6 +3,7 @@ import React from "react";
 import ViewDetails from "../ui/view-details";
 import Link from "next/link";
 
+
 const TransactionList = ({ transaction }) => {
   const formattedDate = new Date(transaction?.date).toLocaleDateString();
 
