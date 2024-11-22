@@ -294,6 +294,7 @@ const NewHiredForm = () => {
             </div>
             <Banks
               paymentMethod={formState.paymentMethod}
+              staffName={formState.receivedBy}
               selectedBank={formState.selectedBank}
               handleSelectChange={handleSelectChange}
             />

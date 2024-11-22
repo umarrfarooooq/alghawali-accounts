@@ -210,6 +210,11 @@ const EditTransaction = ({ transaction }) => {
               />
             </div>
             <Banks
+              staffName={
+                formState.type === "Received"
+                  ? formState.receivedBy
+                  : formState.sendedBy
+              }
               paymentMethod={formState.paymentMethod}
               selectedBank={formState.selectedBank}
               handleSelectChange={handleSelectChange}

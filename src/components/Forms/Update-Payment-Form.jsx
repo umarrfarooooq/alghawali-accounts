@@ -98,7 +98,6 @@ const UpdatePaymentForm = () => {
           ? setPaymentAmount(totalReceived - totalAmount)
           : setPaymentAmount(totalAmount - totalReceived);
       }
-      
 
       setFormState((prev) => ({
         ...prev,
@@ -115,7 +114,6 @@ const UpdatePaymentForm = () => {
   const PaymentFields = useMemo(() => {
     return (
       <>
-      
         <div className="flex flex-col gap-1 w-full">
           <Label label="Payment Type" htmlFor="paymentType" />
           <Input
@@ -152,6 +150,7 @@ const UpdatePaymentForm = () => {
           </div>
         </div>
         <Banks
+          staffName={formState.receiverOrSenderId}
           paymentMethod={formState.paymentMethod}
           selectedBank={formState.selectedBank}
           handleSelectChange={handleSelectChange}
@@ -161,7 +160,12 @@ const UpdatePaymentForm = () => {
         </div>
       </>
     );
-  }, [formState.paymentType, formState.paymentMethod, handleSelectChange]);
+  }, [
+    formState.paymentType,
+    formState.paymentMethod,
+    formState.receiverOrSenderId,
+    handleSelectChange,
+  ]);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();

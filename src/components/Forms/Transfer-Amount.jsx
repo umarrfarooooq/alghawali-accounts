@@ -171,6 +171,7 @@ const TransferAmount = () => {
               />
             </div>
             <Banks
+              staffName={formState.receiverId}
               paymentMethod={formState.paymentMethod}
               selectedBank={formState.selectedBank}
               handleSelectChange={handleSelectChange}
